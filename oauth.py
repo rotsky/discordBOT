@@ -1,5 +1,8 @@
 import json
-from oauthData import  oauthdata
+
+import requests
+
+from oauthData import oauthdata
 from shikimori_api import Shikimori
 
 
@@ -26,21 +29,36 @@ session = Shikimori('disBotAnimeHelper', client_id=oauthdata["client_id"], clien
 api = session.get_api()
 
 
-genre_list = [genre for genre in api.genres.GET() if genre["kind"] == "anime"]
-genre_list.sort(key=sort_key)
-genres = {}
+def get_genres_list():
+    genre_list = [genre for genre in api.genres.GET() if genre["kind"] == "anime"]
+    genre_list.sort(key=sort_key)
+    genres = {}
+    stringr = ""
 
-for genre in genre_list:
-    genres[genre['name']] = genre['id']
-print(genres)
-#
-# print(genre_list)
+    for genre in genre_list:
+        genres[genre['name']] = genre['id']
+    count = 1
+    for genre in genres:
+        genr = (str(count) + ". " + genre + "\n")
+        stringr += genr
+        count = count + 1
+    return stringr
 
-# input("Choose genre: ")
 
-response = api.animes.GET(order='ranked', limit=8)
+def anime_list():
+    animeList = []
+    stringr = ""
+    response = api.animes.GET(order="random",limit=10)
+    # print(response)
+    for title in response:
+        if not title["russian"]:
+            animeList.append(title["name"])
+        else:
+            animeList.append(title["russian"])
+    count = 1
+    for names in animeList:
+        anime = (str(count) + ". " + names + "\n")
+        stringr += anime
+        count = count + 1
+    return stringr
 
-for title in response:
-    print(title["russian"])
-
-# print(response)
